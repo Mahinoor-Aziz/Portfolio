@@ -1,0 +1,11 @@
+<!DOCTYPE html><html lang="en"><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Inbox</title>
+<style>body{font:16px system-ui;background:#14070b;color:#f4e7e8;max-width:680px;margin:40px auto;padding:0 16px}input,button{padding:.6em .9em;border-radius:8px;border:1px solid #5a2a36;background:#1d0a10;color:inherit;font:inherit}article{border-top:1px solid #5a2a36;padding:14px 0;white-space:pre-wrap;overflow-wrap:anywhere}small{color:#b79aa0}</style>
+<h1>Messages</h1><form id="f"><input id="p" type="password" placeholder="Admin password" autocomplete="current-password"> <button>Open inbox</button></form><p id="s"></p><div id="o"></div>
+<script>
+f.onsubmit=async e=>{e.preventDefault();s.textContent='';o.textContent='';
+try{const r=await fetch('/api/admin/messages',{headers:{Authorization:'Bearer '+p.value}});p.value='';
+if(r.status===401)return s.textContent='Wrong password.';if(r.status===429)return s.textContent='Too many attempts. Wait 15 minutes.';if(!r.ok)throw 0;
+const rows=await r.json();s.textContent=rows.length?rows.length+' message(s)':'No messages yet.';
+rows.forEach(m=>{const a=document.createElement('article'),h=document.createElement('small');h.textContent=new Date(m.at).toLocaleString()+' | '+m.name+' | '+m.email;a.append(h,document.createElement('br'),document.createTextNode(m.message));o.append(a)})}
+catch{s.textContent='Backend not reachable. Run npm start.'}};
+</script></html>

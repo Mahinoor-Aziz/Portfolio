@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#eaf0ef">
+  <title>ELORA — Make room for what matters</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="ELORA home">
+        <span class="brand-symbol">e</span>
+        <span>elora<span class="brand-period">.</span></span>
+      </a>
+
+      <div class="side-caption">YOUR SPACE</div>
+      <nav class="side-nav" aria-label="Main navigation">
+        <button class="nav-link active" data-view="today" type="button"><span class="nav-icon">◷</span>Today</button>
+        <button class="nav-link" data-view="upcoming" type="button"><span class="nav-icon">▦</span>Upcoming</button>
+        <button class="nav-link" data-view="all" type="button"><span class="nav-icon">☷</span>All tasks</button>
+      </nav>
+
+      <div class="side-divider"></div>
+      <div class="side-caption">YOUR FILTERS</div>
+      <button class="nav-link filter-link" data-filter="Personal" type="button"><span class="category-dot dot-personal"></span>Personal</button>
+      <button class="nav-link filter-link" data-filter="Study" type="button"><span class="category-dot dot-study"></span>Study</button>
+      <button class="nav-link filter-link" data-filter="Work" type="button"><span class="category-dot dot-work"></span>Work</button>
+
+      <div class="sidebar-note">
+        <span class="note-star">✳</span>
+        <p>Make space for<br><em>what matters.</em></p>
+        <span class="note-small">ONE THING AT A TIME</span>
+      </div>
+      <div class="sidebar-bottom"><span class="status-dot"></span> A little progress counts.</div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-symbol">e</span><span>elora<span class="brand-period">.</span></span></div>
+        <div class="topbar-date" id="topDate">YOUR PERSONAL SPACE</div>
+        <div class="topbar-right"><span class="today-label">A calmer way to plan</span><span class="avatar">M</span></div>
+      </header>
+
+      <section class="welcome-row">
+        <div>
+          <p class="eyebrow" id="welcomeEyebrow">SUNDAY, NOVEMBER 1</p>
+          <h1 id="welcomeTitle">Make room for<br><em>what matters.</em></h1>
+          <p class="welcome-subtitle">A little clarity can change the shape of your day.</p>
+        </div>
+        <div class="welcome-art" aria-hidden="true">
+          <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+          <div class="art-sun"></div><div class="art-leaf leaf-one"></div><div class="art-leaf leaf-two"></div>
+          <span class="art-spark spark-one">✳</span><span class="art-spark spark-two">✦</span>
+        </div>
+      </section>
+
+      <section class="calendar-section" aria-label="Choose a date">
+        <div class="section-heading calendar-heading">
+          <div><p class="eyebrow">YOUR CALENDAR</p><h2 id="monthTitle">November 2026</h2></div>
+          <div class="calendar-controls">
+            <button class="icon-button" id="prevMonth" aria-label="Previous month" type="button">‹</button>
+            <button class="icon-button" id="nextMonth" aria-label="Next month" type="button">›</button>
+            <button class="today-button" id="goToday" type="button">Today</button>
+          </div>
+        </div>
+        <div class="date-strip" id="dateStrip" aria-label="Dates in selected week"></div>
+      </section>
+
+      <section class="task-area">
+        <div class="task-main">
+          <div class="section-heading task-heading">
+            <div><p class="eyebrow" id="taskEyebrow">YOUR DAY</p><h2 id="taskTitle">Today's focus</h2></div>
+            <button class="add-button" id="openTaskModal" type="button"><span>＋</span> Add task</button>
+          </div>
+
+          <div class="missed-wrap" id="missedWrap">
+            <button class="missed-toggle" id="missedToggle" type="button" aria-expanded="false">
+              <span class="missed-left"><span class="missed-mark">↗</span><span><strong>Past due</strong><small id="missedSummary">Nothing waiting here</small></span></span>
+              <span class="missed-right"><span class="missed-count" id="missedCount">0</span><span class="chevron">⌄</span></span>
+            </button>
+            <div class="missed-list" id="missedList" hidden></div>
+          </div>
+
+          <div class="task-toolbar">
+            <div class="task-tabs" role="group" aria-label="Filter tasks">
+              <button class="tab-button selected" data-task-filter="all" type="button">All <span id="tabAllCount">0</span></button>
+              <button class="tab-button" data-task-filter="active" type="button">To do <span id="tabActiveCount">0</span></button>
+              <button class="tab-button" data-task-filter="completed" type="button">Done <span id="tabDoneCount">0</span></button>
+            </div>
+            <span class="task-date-label" id="selectedDateLabel">SUNDAY, NOV 1</span>
+          </div>
+          <div class="task-list" id="taskList" aria-live="polite"></div>
+          <div class="empty-state" id="emptyState">
+            <div class="empty-illustration"><span>✳</span></div>
+            <h3>A little room to breathe.</h3>
+            <p>No tasks here yet. Add one when you're ready.</p>
+            <button class="text-add" id="emptyAdd" type="button">＋ Add your first task</button>
+          </div>
+        </div>
+
+        <aside class="right-rail">
+          <section class="progress-card">
+            <div class="progress-top"><span class="eyebrow">A MOMENT TO NOTICE</span><span class="progress-spark">✳</span></div>
+            <h3>Look how far<br>you've come.</h3>
+            <div class="progress-visual">
+              <div class="progress-ring" id="progressRing"><div class="ring-inner"><strong id="progressPercent">0%</strong><span>COMPLETE</span></div></div>
+              <div class="progress-copy"><strong id="progressFraction">0 / 0</strong><span>tasks finished</span></div>
+            </div>
+            <div class="progress-track"><span id="progressBar"></span></div>
+            <p class="progress-footnote">Progress is made one small step at a time.</p>
+          </section>
+
+          <section class="gentle-card">
+            <span class="gentle-icon">✦</span>
+            <p class="eyebrow">A GENTLE REMINDER</p>
+            <blockquote>You don't have to do it all. Just begin with one thing.</blockquote>
+            <span class="gentle-rule"></span>
+            <span class="gentle-credit">A NOTE TO YOURSELF</span>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="page-footer"><span>ELORA<span class="brand-period">.</span> <b>MAKE ROOM FOR WHAT MATTERS.</b></span><span>BUILT WITH CARE · HTML / CSS / JS</span></footer>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <section class="task-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header"><div><p class="eyebrow">A NEW LITTLE STEP</p><h2 id="modalTitle">Add a task</h2></div><button class="modal-close" id="closeModal" type="button" aria-label="Close">×</button></div>
+      <form id="taskForm">
+        <label class="field-label" for="taskName">What would you like to do?</label>
+        <input id="taskName" name="taskName" type="text" maxlength="90" placeholder="Give your task a name…" required autocomplete="off">
+        <label class="field-label" for="taskDetails">A little detail <span>(optional)</span></label>
+        <textarea id="taskDetails" name="taskDetails" rows="2" maxlength="180" placeholder="Add a note to help you remember…"></textarea>
+        <div class="form-row">
+          <div class="form-field"><label class="field-label" for="taskDate">Date</label><input id="taskDate" name="taskDate" type="date" required></div>
+          <div class="form-field"><label class="field-label" for="taskCategory">Category</label><select id="taskCategory" name="taskCategory"><option>Personal</option><option>Study</option><option>Work</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label class="field-label" for="taskPriority">Priority</label><select id="taskPriority" name="taskPriority"><option value="normal">Just right</option><option value="high">Important</option><option value="low">Whenever</option></select></div>
+          <div class="form-field"><label class="field-label" for="taskTime">Time <span>(optional)</span></label><input id="taskTime" name="taskTime" type="time"></div>
+        </div>
+        <p class="form-error" id="formError" role="alert"></p>
+        <div class="modal-actions"><button class="cancel-button" id="cancelModal" type="button">Cancel</button><button class="save-button" type="submit" id="saveTask">Save task <span>→</span></button></div>
+      </form>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
