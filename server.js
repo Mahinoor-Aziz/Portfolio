@@ -3,6 +3,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import OpenAI from 'openai';
+import { createClient } from '@supabase/supabase-js';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
@@ -17,6 +18,19 @@ const ORIGINS = (process.env.ALLOWED_ORIGIN || '').split(',').map(s => s.trim())
 const AI_KEY = process.env.AI_API_KEY || process.env.OPENAI_API_KEY || '';
 const AI_READY = AI_KEY && !/your_secret_key_here|^paste/i.test(AI_KEY);
 const client = AI_READY ? new OpenAI({ apiKey: AI_KEY, baseURL: process.env.AI_BASE_URL || undefined }) : null;
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY;
+
+const supabase = SUPABASE_URL && SUPABASE_SECRET_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_SECRET_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
+    })
+  : null;
+
+if (!supabase) warn('Supabase credentials missing: contact inbox disabled');
 const SITE_URL = (process.env.SITE_URL || 'http://localhost:5000').replace(/\/$/, '');
 const warn = m => console.warn('[config] ' + m);
 if (!AI_READY) warn('AI_API_KEY missing or still a placeholder: chat disabled');
@@ -81,22 +95,77 @@ app.get('/api/profile', (_req, res) => res.json(raw)); // public page content on
 app.get('/api/email', lim(3_600_000, 10), (_req, res) =>
   process.env.CONTACT_EMAIL ? res.json({ email: process.env.CONTACT_EMAIL }) : res.status(404).json({ error: 'not_configured' }));
 
-app.post('/api/contact', lim(3_600_000, 5), (req, res) => {
+app.post('/api/contact', lim(3_600_000, 5), async (req, res) => {
   const { name, email, message, website } = req.body || {};
-  if (website) return res.json({ ok: true }); // honeypot: bots fill this hidden field
-  const s = (v, max) => (typeof v === 'string' ? v.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').trim().slice(0, max) : '');
-  const n = s(name, 80), e = s(email, 120), m = s(message, 2000);
-  if (!n || m.length < 5 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return res.status(400).json({ error: 'invalid_input' });
-  if (fs.existsSync(MSG_FILE) && fs.statSync(MSG_FILE).size > 5_000_000) return res.status(503).json({ error: 'inbox_full' });
-  try { fs.appendFileSync(MSG_FILE, JSON.stringify({ id: crypto.randomUUID(), at: new Date().toISOString(), name: n, email: e, message: m }) + '\n', { mode: 0o600 }); }
-  catch (err) { console.error('Could not store message:', err.message); return res.status(500).json({ error: 'server_error' }); }
-  res.json({ ok: true });
+
+  if (website) return res.json({ ok: true });
+
+  const s = (v, max) =>
+    typeof v === 'string'
+      ? v.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').trim().slice(0, max)
+      : '';
+
+  const n = s(name, 80);
+  const e = s(email, 120);
+  const m = s(message, 2000);
+
+  if (!n || m.length < 5 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
+    return res.status(400).json({ error: 'invalid_input' });
+  }
+
+  if (!supabase) {
+    return res.status(503).json({ error: 'not_configured' });
+  }
+
+  try {
+    const { error } = await supabase
+      .from('contact_messages')
+      .insert({
+        id: crypto.randomUUID(),
+        name: n,
+        email: e,
+        message: m
+      });
+
+    if (error) throw error;
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('Could not store message:', err.message);
+    return res.status(500).json({ error: 'server_error' });
+  }
 });
 
-app.get('/api/admin/messages', lim(15 * 60_000, 10), (req, res) => {
-  if (!checkPassword((req.get('authorization') || '').replace(/^Bearer /, ''))) return res.status(401).json({ error: 'unauthorized' });
-  const rows = fs.existsSync(MSG_FILE) ? fs.readFileSync(MSG_FILE, 'utf8').trim().split('\n').filter(Boolean).map(l => JSON.parse(l)).reverse() : [];
-  res.json(rows);
+app.get('/api/admin/messages', lim(15 * 60_000, 10), async (req, res) => {
+  if (!checkPassword((req.get('authorization') || '').replace(/^Bearer /, ''))) {
+    return res.status(401).json({ error: 'unauthorized' });
+  }
+
+  if (!supabase) {
+    return res.status(503).json({ error: 'not_configured' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('contact_messages')
+      .select('id, created_at, name, email, message')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    const rows = data.map(m => ({
+      id: m.id,
+      at: m.created_at,
+      name: m.name,
+      email: m.email,
+      message: m.message
+    }));
+
+    return res.json(rows);
+  } catch (err) {
+    console.error('Could not retrieve messages:', err.message);
+    return res.status(500).json({ error: 'server_error' });
+  }
 });
 
 app.post('/api/ai-recruiter/chat', lim(60_000, 15), async (req, res) => {
