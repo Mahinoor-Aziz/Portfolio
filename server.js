@@ -197,4 +197,10 @@ app.get('/sitemap.xml', (_req, res) => res.type('application/xml').send(`<?xml v
 app.use(express.static(PUBLIC_DIR, { dotfiles: 'deny', index: false }));
 app.use((req, res) => req.path.startsWith('/api') ? res.status(404).json({ error: 'not_found' }) : res.status(404).sendFile(path.join(PUBLIC_DIR, '404.html')));
 app.use((err, _req, res, _next) => { console.error('Request error:', err.message); const code = err.status >= 400 && err.status < 500 ? err.status : 500; res.status(code).json({ error: code === 500 ? 'server_error' : 'invalid_input' }); });
-app.listen(process.env.PORT || 5000, () => console.log(`Portfolio running on port ${process.env.PORT || 5000}`));
+export default app;
+
+if (!process.env.VERCEL) {
+  app.listen(process.env.PORT || 5000, () => {
+    console.log(`Portfolio running on port ${process.env.PORT || 5000}`);
+  });
+}
