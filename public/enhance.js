@@ -51,3 +51,16 @@
   decorate(); new MutationObserver(decorate).observe(document.querySelector('main'), { childList: true, subtree: true });
   document.addEventListener('mousemove', e => { const k = e.target.closest && e.target.closest('.fx-card'); if (k) { const r = k.getBoundingClientRect(); k.style.setProperty('--mx', e.clientX - r.left + 'px'); k.style.setProperty('--my', e.clientY - r.top + 'px'); } });
 })();
+(()=>{
+const L=[['GitHub','https://github.com/Mahinoor-Aziz'],['LinkedIn','https://www.linkedin.com/in/mahnoor-tariq-aziz-5349ba3a8']];
+let tries=0;
+const t=setInterval(()=>{
+  const host=document.querySelector('#contact');
+  if(host&&!host.querySelector('.social-row')){
+    const row=document.createElement('div');row.className='social-row';
+    row.innerHTML=L.map(([n,u])=>`<a class="btn ghost" href="${u}" target="_blank" rel="noopener noreferrer">${n}</a>`).join('');
+    const f=host.querySelector('#cf');(f?f.parentNode:host).append(row);
+  }
+  if(host&&host.querySelector('.social-row')||++tries>20)clearInterval(t);
+},300);
+})();
