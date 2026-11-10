@@ -30,6 +30,7 @@
 html{scroll-behavior:smooth;scroll-padding-top:72px}
 body{background:var(--bg);color:var(--rose);font:400 1.0625rem/1.65 var(--body)}
 a{color:inherit}
+  .social-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:1.2rem;position:relative;z-index:2}
 :focus-visible{outline:2px solid var(--crim);outline-offset:3px}
 .todo{opacity:.55;font-style:italic}
 header{position:fixed;inset:0 0 auto;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:14px clamp(18px,4vw,48px);background:rgba(20,7,11,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
@@ -39,6 +40,16 @@ nav a{text-decoration:none;color:var(--mute)}nav a:hover{color:var(--rose)}
 .btn{display:inline-block;padding:.7em 1.3em;border:1px solid var(--crim);border-radius:999px;background:var(--crim);color:#fff;font:600 .95rem var(--body);cursor:pointer;text-decoration:none}
 .btn.ghost{background:transparent;color:var(--rose);border-color:var(--line)}
 .btn:hover{filter:brightness(1.12)}
+  body::before{content:"";position:fixed;inset:-20%;z-index:0;pointer-events:none;
+  background:
+   radial-gradient(40% 35% at 20% 25%,rgba(215,40,72,.30),transparent 70%),
+   radial-gradient(35% 30% at 80% 35%,rgba(124,92,255,.24),transparent 70%),
+   radial-gradient(40% 35% at 55% 85%,rgba(255,180,84,.13),transparent 70%);
+  filter:blur(30px);animation:aur 26s ease-in-out infinite alternate}
+@keyframes aur{to{transform:translate3d(4%,-3%,0) rotate(6deg) scale(1.08)}}
+#gl{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none}
+main{position:relative;z-index:1}
+section.s{background:transparent}
 /* hero */
 .hero{position:relative;min-height:100svh;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:center;gap:2rem;padding:110px clamp(18px,5vw,72px) 70px;overflow:hidden;isolation:isolate}
 #film{position:absolute;inset:0;width:100%;height:100%;z-index:-2}
