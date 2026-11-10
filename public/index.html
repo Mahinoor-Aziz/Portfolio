@@ -15,6 +15,15 @@
 
 
 <style>
+  :root{--vio:#7c5cff;--amber:#ffb454}
+.btn.ghost:hover{border-color:var(--vio);box-shadow:0 0 0 3px rgba(124,92,255,.18)}
+.st b,.yt-number b,.yt-experience-number{
+  background:linear-gradient(120deg,#ff4d6d,var(--amber));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.tags span:nth-child(3n+2){border-color:rgba(124,92,255,.45)}
+.tags span:nth-child(3n){border-color:rgba(255,180,84,.4)}
+.links a,.yt-channel-bottom a{color:var(--amber)}
+.bn:nth-child(even){background:linear-gradient(160deg,#2a1450,var(--bg2) 60%)}
 :root{color-scheme:dark;--bg:#14070b;--bg2:#1d0a10;--wine:#4a0e1c;--crim:#d72848;--rose:#f4e7e8;--mute:#b79aa0;--line:rgba(255,200,205,.14);
 --head:'Bricolage Grotesque',system-ui,sans-serif;--body:'Hanken Grotesk',system-ui,sans-serif}
 *{box-sizing:border-box;margin:0}
