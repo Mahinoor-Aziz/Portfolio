@@ -8,4 +8,5 @@ if(r.status===401)return s.textContent='Wrong password.';if(r.status===429)retur
 const rows=await r.json();s.textContent=rows.length?rows.length+' message(s)':'No messages yet.';
 rows.forEach(m=>{const a=document.createElement('article'),h=document.createElement('small');h.textContent=new Date(m.at).toLocaleString()+' | '+m.name+' | '+m.email;a.append(h,document.createElement('br'),document.createTextNode(m.message));o.append(a)})}
 catch{s.textContent='Backend not reachable. Run npm start.'}};
+  .social-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:1.2rem;position:relative;z-index:2}
 </script></html>
