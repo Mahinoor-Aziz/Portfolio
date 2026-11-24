@@ -1,31 +1,218 @@
-# Portfolio with 3D hero, AI Recruiter and secure contact
+# Mahnoor Aziz | AI-Powered Developer Portfolio
 
-## Run
-1. `npm install`
-2. Copy `.env.example` to `.env` and fill in: `OPENAI_API_KEY`, `CONTACT_EMAIL` (your private email), `ADMIN_PASSWORD_HASH`.
-3. Make the admin hash: `npm run hash-password -- "your-long-password"`, then paste the printed line into `.env`.
-4. `npm start`, open http://localhost:5000
-5. Read messages at http://localhost:5000/admin.html (password login).
+A personal portfolio showcasing my development projects, technical skills, and experience, with an AI-powered recruiter assistant designed to answer questions about my background and work.
 
-Edit `data/knowledge.json` to change page content and what the AI knows. "TODO" fields show dimmed and are never given to the AI.
+Built to go beyond a static portfolio by combining frontend development, backend functionality, AI integration, and security-conscious implementation.
 
-## Security in this project
-- API key, email and admin hash live only in `.env` (git-ignored); the email is not in any HTML or JSON file.
-- Admin password is stored as a salted scrypt hash and compared in constant time.
-- Helmet security headers with a Content-Security-Policy; JSON body limit; input validation; honeypot field; rate limits on chat, contact, email reveal and admin login; origin allow-list.
-- Messages are saved to `data/messages.jsonl` (git-ignored). Back it up before redeploying on hosts with temporary disks.
-- CSP allows inline scripts (the page uses them); a stricter setup would move scripts into files.
+---
 
-## Notes
-- Live Server shows the page content only; chat, contact and admin need `npm start`.
-- Project demos are in `public/projects/`. Add GitHub/live links in `knowledge.json`.
-- The 3D hero uses three.js from cdnjs and falls back to the 2D animation if unavailable.
+## Overview
 
-## Production checklist (what is covered)
-- Pages: custom 404, privacy page, sitemap.xml and robots.txt (served by the backend from `SITE_URL`).
-- SEO and sharing: title, meta description, canonical, Open Graph and Twitter cards, `og.jpg`, full favicon set and web manifest.
-- UX: mobile breakpoints, sticky mobile "Message me" button, loading and error states, alt text, compressed images.
-- Not included on purpose: cookie banner (no cookies or trackers are used), analytics, terms page, thank-you page (the form confirms inline).
-- Before deploying: set `NODE_ENV=production`, `SITE_URL`, `ALLOWED_ORIGIN`, `TRUST_PROXY` (if behind a proxy), then run `npm run check-secrets` and `npm run audit`.
-- Keep dependencies current with `npm outdated` and `npm update`, then re-run `npm run audit`.
-- Live Server serves the whole folder, so use it only for local previews; never deploy that way.
+This project is a full-stack personal portfolio designed to present my work and make exploring my technical background more interactive.
+
+Alongside the portfolio experience, it includes an AI recruiter assistant that uses structured portfolio information to respond to questions about my skills, projects, and experience.
+
+The project focuses on practical implementation, maintainable code, responsive design, and responsible handling of sensitive information.
+
+## Features
+
+- **Interactive Portfolio:** A personal portfolio presenting projects, skills, and professional information.
+- **AI Recruiter Assistant:** An AI-powered chat interface that answers questions using structured portfolio knowledge.
+- **Backend API:** An Express.js server handling application functionality and API requests.
+- **Contact System:** A contact form with server-side processing and message storage.
+- **Admin Dashboard:** Password-protected access to submitted messages.
+- **Responsive Interface:** Layouts designed for different screen sizes.
+- **3D Hero Experience:** An animated 3D visual with a 2D fallback.
+- **SEO & Metadata:** Search and social-sharing metadata, sitemap, robots.txt, and custom favicon assets.
+
+## Technology Stack
+
+| Area | Technologies |
+|---|---|
+| Frontend | HTML, CSS, JavaScript |
+| Backend | Node.js, Express.js |
+| AI Integration | OpenAI API |
+| Security | Helmet, express-rate-limit, scrypt |
+| Configuration | dotenv |
+| Visual Experience | Three.js |
+| Version Control | Git & GitHub |
+
+## Project Structure
+
+```text
+Portfolio/
+│
+├── data/
+│   └── knowledge.json
+│
+├── public/
+│   ├── projects/
+│   └── ...
+│
+├── scripts/
+│   ├── hash-password.js
+│   └── check-secrets.js
+│
+├── .env.example
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── server.js
+└── README.md
+```
+
+**Key directories and files**
+
+- `data/knowledge.json` — Stores structured portfolio information used by the AI assistant.
+- `public/` — Contains frontend assets and project resources.
+- `scripts/` — Contains password-hashing and security-check utilities.
+- `server.js` — Handles the Express backend and server-side functionality.
+- `.env.example` — Documents the environment variables required to run the application.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18 or later
+- npm
+- Git
+- An OpenAI API key
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/Mahinoor-Aziz/Portfolio.git
+```
+
+2. Navigate into the project:
+
+```bash
+cd Portfolio
+```
+
+3. Install dependencies:
+
+```bash
+npm install
+```
+
+### Environment Configuration
+
+Create a `.env` file using `.env.example` as a template.
+
+Configure the following variables:
+
+```env
+OPENAI_API_KEY=your_openai_api_key
+CONTACT_EMAIL=your_private_email
+ADMIN_PASSWORD_HASH=your_generated_password_hash
+```
+
+Generate a secure admin password hash:
+
+```bash
+npm run hash-password -- "your-long-password"
+```
+
+Copy the generated hash into your `.env` file.
+
+Keep `.env` private. Never commit API keys, passwords, or other sensitive credentials to GitHub.
+
+### Run Locally
+
+Start the application:
+
+```bash
+npm start
+```
+
+For development with automatic server restarts:
+
+```bash
+npm run dev
+```
+
+Open the following URLs:
+
+| Endpoint | Purpose |
+|---|---|
+| `http://localhost:5000` | Portfolio website |
+| `http://localhost:5000/admin.html` | Admin dashboard |
+
+The admin dashboard requires password authentication.
+
+## Security Implementation
+
+Security is considered throughout the application rather than treated as an afterthought.
+
+Implemented measures include:
+
+- Environment-based storage of sensitive credentials.
+- Salted scrypt password hashing.
+- Constant-time password comparison.
+- HTTP security headers using Helmet.
+- Content Security Policy.
+- Request rate limiting on sensitive endpoints.
+- Server-side input validation.
+- Honeypot field for contact-form spam protection.
+- Origin allow-list validation.
+- JSON request-body size limits.
+- Git exclusions for environment files and stored messages.
+
+## Available Scripts
+
+| Command | Description |
+|---|---|
+| `npm start` | Starts the production server |
+| `npm run dev` | Starts the development server with watch mode |
+| `npm run hash-password` | Generates an admin password hash |
+| `npm run check-secrets` | Checks for exposed secrets |
+| `npm run audit` | Audits production dependencies |
+
+## Configuration & Maintenance
+
+Portfolio content and AI knowledge can be updated through:
+
+```text
+data/knowledge.json
+```
+
+The application also uses environment-based configuration for production settings, including:
+
+- `NODE_ENV`
+- `SITE_URL`
+- `ALLOWED_ORIGIN`
+- `TRUST_PROXY`
+
+Before deployment, configure these values appropriately and run:
+
+```bash
+npm run check-secrets
+npm run audit
+```
+
+**Storage consideration:** Contact messages are stored in `data/messages.jsonl`. On hosting platforms with temporary filesystems, arrange persistent storage or backups before deployment.
+
+## Current Development Status
+
+The project has a working local development setup and includes frontend, backend, AI integration, and security-related functionality.
+
+Deployment and production configuration remain separate steps.
+
+---
+
+## About the Developer
+
+**Mahnoor Aziz**
+
+Computer Science Student | Aspiring Full-Stack Developer
+
+Interested in building practical web applications, exploring software architecture, and understanding how frontend interfaces, backend systems, APIs, and databases work together.
+
+- [LinkedIn](https://www.linkedin.com/in/mahnoor-tariq-aziz-5349ba3a8/)
+- [Portfolio](https://mahnoorportfolio-nu.vercel.app/)
+- [GitHub](https://github.com/Mahinoor-Aziz)
+
+*Curious by nature. Building by practice.*
