@@ -1,29 +1,29 @@
 # Mahnoor Aziz | AI-Powered Developer Portfolio
 
-A personal portfolio showcasing my development projects, technical skills, and experience, with an AI-powered recruiter assistant designed to answer questions about my background and work.
+A personal portfolio showcasing my development work, technical skills, and experience. It includes an AI recruiter assistant and a backend-powered contact system.
 
-Built to go beyond a static portfolio by combining frontend development, backend functionality, AI integration, and security-conscious implementation.
+The project brings together frontend development, backend APIs, AI integration, database-backed functionality, and security-conscious implementation.
+
+**Live portfolio:** https://mahnoorportfolio-nu.vercel.app/
 
 ---
 
 ## Overview
 
-This project is a full-stack personal portfolio designed to present my work and make exploring my technical background more interactive.
+This is a full-stack personal portfolio built to present my work and make exploring my technical background more interactive.
 
-Alongside the portfolio experience, it includes an AI recruiter assistant that uses structured portfolio information to respond to questions about my skills, projects, and experience.
-
-The project focuses on practical implementation, maintainable code, responsive design, and responsible handling of sensitive information.
+It includes an AI recruiter assistant that uses structured portfolio information to answer questions about my skills and projects, along with a contact form and a password-protected admin area for submitted messages.
 
 ## Features
 
-- **Interactive Portfolio:** A personal portfolio presenting projects, skills, and professional information.
-- **AI Recruiter Assistant:** An AI-powered chat interface that answers questions using structured portfolio knowledge.
-- **Backend API:** An Express.js server handling application functionality and API requests.
-- **Contact System:** A contact form with server-side processing and message storage.
-- **Admin Dashboard:** Password-protected access to submitted messages.
+- **Interactive Portfolio:** Presents projects, skills, and professional information.
+- **AI Recruiter Assistant:** Answers questions using structured portfolio knowledge through an OpenAI-compatible API.
+- **Backend API:** Express.js server for application and API functionality.
+- **Contact System:** Validates and stores submitted messages in Supabase.
+- **Admin Dashboard:** Password-protected access to contact submissions.
 - **Responsive Interface:** Layouts designed for different screen sizes.
-- **3D Hero Experience:** An animated 3D visual with a 2D fallback.
-- **SEO & Metadata:** Search and social-sharing metadata, sitemap, robots.txt, and custom favicon assets.
+- **3D Hero Experience:** Animated 3D visual with a 2D fallback.
+- **SEO & Metadata:** Includes search and social-sharing metadata, sitemap, robots.txt, and favicon assets.
 
 ## Technology Stack
 
@@ -32,6 +32,7 @@ The project focuses on practical implementation, maintainable code, responsive d
 | Frontend | HTML, CSS, JavaScript |
 | Backend | Node.js, Express.js |
 | AI Integration | OpenAI API |
+| Database | Supabase |
 | Security | Helmet, express-rate-limit, scrypt |
 | Configuration | dotenv |
 | Visual Experience | Three.js |
@@ -63,11 +64,11 @@ Portfolio/
 
 **Key directories and files**
 
-- `data/knowledge.json` — Stores structured portfolio information used by the AI assistant.
-- `public/` — Contains frontend assets and project resources.
-- `scripts/` — Contains password-hashing and security-check utilities.
-- `server.js` — Handles the Express backend and server-side functionality.
-- `.env.example` — Documents the environment variables required to run the application.
+- `data/knowledge.json` — Structured portfolio information used by the AI assistant.
+- `public/` — Frontend pages, assets, and project resources.
+- `scripts/` — Password-hashing and security-check utilities.
+- `server.js` — Express backend, API routes, and server-side functionality.
+- `.env.example` — Template documenting the environment variables used by the application.
 
 ## Getting Started
 
@@ -76,7 +77,8 @@ Portfolio/
 - Node.js 18 or later
 - npm
 - Git
-- An OpenAI API key
+- A Supabase project
+- An OpenAI API key for the AI recruiter assistant
 
 ### Installation
 
@@ -102,23 +104,35 @@ npm install
 
 Create a `.env` file using `.env.example` as a template.
 
-Configure the following variables:
+Configure the values for your environment:
 
 ```env
 OPENAI_API_KEY=your_openai_api_key
-CONTACT_EMAIL=your_private_email
+OPENAI_MODEL=gpt-4.1-mini
+
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SECRET_KEY=your_supabase_secret_key
+
 ADMIN_PASSWORD_HASH=your_generated_password_hash
+PORT=5000
+ALLOWED_ORIGIN=http://localhost:5000
+SITE_URL=http://localhost:5000
+NODE_ENV=development
+TRUST_PROXY=
+CONTACT_EMAIL=you@example.com
 ```
 
-Generate a secure admin password hash:
+The Supabase credentials are used by the contact-message and admin functionality. The OpenAI API key enables the AI recruiter assistant.
+
+Generate an admin password hash:
 
 ```bash
 npm run hash-password -- "your-long-password"
 ```
 
-Copy the generated hash into your `.env` file.
+Copy the generated hash into `ADMIN_PASSWORD_HASH`.
 
-Keep `.env` private. Never commit API keys, passwords, or other sensitive credentials to GitHub.
+Keep your `.env` file private. Never commit API keys, database credentials, passwords, or other secrets to GitHub. Use the appropriate production values in your hosting environment rather than copying local development settings.
 
 ### Run Locally
 
@@ -134,74 +148,66 @@ For development with automatic server restarts:
 npm run dev
 ```
 
-Open the following URLs:
+Open:
 
-| Endpoint | Purpose |
+| URL | Purpose |
 |---|---|
 | `http://localhost:5000` | Portfolio website |
 | `http://localhost:5000/admin.html` | Admin dashboard |
 
-The admin dashboard requires password authentication.
+The admin dashboard requires password authentication and the backend's configured database connection.
 
 ## Security Implementation
 
-Security is considered throughout the application rather than treated as an afterthought.
+Security measures implemented in the application include:
 
-Implemented measures include:
-
-- Environment-based storage of sensitive credentials.
+- Environment-based configuration for sensitive credentials.
 - Salted scrypt password hashing.
 - Constant-time password comparison.
-- HTTP security headers using Helmet.
-- Content Security Policy.
-- Request rate limiting on sensitive endpoints.
+- HTTP security headers and Content Security Policy using Helmet.
+- Rate limiting on sensitive API routes.
 - Server-side input validation.
 - Honeypot field for contact-form spam protection.
 - Origin allow-list validation.
 - JSON request-body size limits.
-- Git exclusions for environment files and stored messages.
+- Git exclusions for environment files and local message data.
 
 ## Available Scripts
 
 | Command | Description |
 |---|---|
-| `npm start` | Starts the production server |
-| `npm run dev` | Starts the development server with watch mode |
+| `npm start` | Starts the server |
+| `npm run dev` | Starts the server with Node.js watch mode |
 | `npm run hash-password` | Generates an admin password hash |
 | `npm run check-secrets` | Checks for exposed secrets |
 | `npm run audit` | Audits production dependencies |
 
 ## Configuration & Maintenance
 
-Portfolio content and AI knowledge can be updated through:
+The assistant's structured portfolio knowledge can be updated in:
 
 ```text
 data/knowledge.json
 ```
 
-The application also uses environment-based configuration for production settings, including:
+Review these environment settings when configuring a deployment:
 
 - `NODE_ENV`
 - `SITE_URL`
 - `ALLOWED_ORIGIN`
 - `TRUST_PROXY`
+- `SUPABASE_URL`
+- `SUPABASE_SECRET_KEY`
+- `OPENAI_API_KEY`
 
-Before deployment, configure these values appropriately and run:
+Before deployment, review the configuration and run:
 
 ```bash
 npm run check-secrets
 npm run audit
 ```
 
-**Storage consideration:** Contact messages are stored in `data/messages.jsonl`. On hosting platforms with temporary filesystems, arrange persistent storage or backups before deployment.
-
-## Current Development Status
-
-The project has a working local development setup and includes frontend, backend, AI integration, and security-related functionality.
-
-Deployment and production configuration remain separate steps.
-
----
+**Message storage:** Contact submissions are stored in the Supabase `contact_messages` table. They are not stored in `data/messages.jsonl`. Make sure the Supabase project and required table are configured for the contact and admin features.
 
 ## About the Developer
 
@@ -209,7 +215,7 @@ Deployment and production configuration remain separate steps.
 
 Computer Science Student | Aspiring Full-Stack Developer
 
-Interested in building practical web applications, exploring software architecture, and understanding how frontend interfaces, backend systems, APIs, and databases work together.
+Interested in building practical web applications and understanding how frontend interfaces, backend systems, APIs, and databases work together.
 
 - [LinkedIn](https://www.linkedin.com/in/mahnoor-tariq-aziz-5349ba3a8/)
 - [Portfolio](https://mahnoorportfolio-nu.vercel.app/)
