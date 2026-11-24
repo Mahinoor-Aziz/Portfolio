@@ -30,9 +30,9 @@ const supabase = SUPABASE_URL && SUPABASE_SECRET_KEY
     })
   : null;
 
+const warn = m => console.warn('[config] ' + m);
 if (!supabase) warn('Supabase credentials missing: contact inbox disabled');
 const SITE_URL = (process.env.SITE_URL || 'http://localhost:5000').replace(/\/$/, '');
-const warn = m => console.warn('[config] ' + m);
 if (!AI_READY) warn('AI_API_KEY missing or still a placeholder: chat disabled');
 if (!process.env.CONTACT_EMAIL) warn('CONTACT_EMAIL missing: "Show my email" disabled');
 if (!process.env.ADMIN_PASSWORD_HASH) warn('ADMIN_PASSWORD_HASH missing: admin inbox disabled');
