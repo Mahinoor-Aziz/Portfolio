@@ -1,59 +1,980 @@
-<!DOCTYPE html><html lang="en"><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Inbox</title>
-<style>body{font:16px system-ui;background:#14070b;color:#f4e7e8;max-width:680px;margin:40px auto;padding:0 16px}input,button{padding:.6em .9em;border-radius:8px;border:1px solid #5a2a36;background:#1d0a10;color:inherit;font:inherit}article{border-top:1px solid #5a2a36;padding:14px 0;white-space:pre-wrap;overflow-wrap:anywhere}small{color:#b79aa0}</style>
-<h1>Messages</h1><form id="f"><input id="p" type="password" placeholder="Admin password" autocomplete="current-password"> <button>Open inbox</button></form><p id="s"></p><div id="o"></div>
 
-<script>
-f.onsubmit = async e => {
-  e.preventDefault();
-  s.textContent = 'Connecting...';
-  o.textContent = '';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#160b10">
+  <title>Private Inbox — Mahnoor Aziz</title>
 
-  try {
-    const r = await fetch('/api/admin/messages', {
-      headers: { Authorization: 'Bearer ' + p.value }
+  <style>
+    :root {
+      --bg: #160b10;
+      --surface: #201117;
+      --surface-2: #291720;
+      --surface-3: #321d27;
+      --border: rgba(230, 190, 199, .12);
+      --text: #f4e9eb;
+      --muted: #ad929a;
+      --soft: #d6bdc3;
+      --accent: #a65c70;
+      --accent-light: #d69aaa;
+      --danger: #e5a0a0;
+      --success: #a5c6ad;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 85% 5%, rgba(112,43,56,.16), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .eyebrow {
+      color: var(--accent-light);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .19em;
+      text-transform: uppercase;
+    }
+
+    /* LOGIN */
+
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 18px;
+    }
+
+    .login-wrap {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 58px;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(214,154,170,.35);
+      border-radius: 12px;
+      color: var(--accent-light);
+      font-family: Georgia, serif;
+      font-size: 22px;
+    }
+
+    .brand-name {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .12em;
+    }
+
+    .brand-sub {
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .12em;
+      margin-top: 2px;
+    }
+
+    .login-heading {
+      margin: 15px 0 10px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(42px, 9vw, 58px);
+      font-weight: 400;
+      letter-spacing: -.055em;
+      line-height: 1.05;
+    }
+
+    .login-description {
+      max-width: 330px;
+      color: var(--muted);
+      margin: 0 0 34px;
+      font-size: 14px;
+    }
+
+    .login-panel {
+      padding: 25px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(145deg, #291720, #1e1117);
+      box-shadow: 0 24px 80px rgba(0,0,0,.24);
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .password-input,
+    .search-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 14px;
+      color: var(--text);
+      background: #170d12;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .password-input:focus,
+    .search-input:focus {
+      border-color: var(--accent-light);
+      box-shadow: 0 0 0 3px rgba(214,154,170,.1);
+    }
+
+    .primary-button {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 15px;
+      border: 0;
+      border-radius: 10px;
+      color: white;
+      background: linear-gradient(110deg, #814052, #a65c70);
+      font-size: 13px;
+      font-weight: 700;
+      transition: transform .2s, filter .2s;
+    }
+
+    .primary-button:hover {
+      filter: brightness(1.12);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: wait;
+      transform: none;
+    }
+
+    .login-message {
+      min-height: 22px;
+      margin: 13px 0 0;
+      color: var(--danger);
+      font-size: 12px;
+    }
+
+    .login-footer {
+      margin-top: 25px;
+      color: #806c73;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    /* INBOX */
+
+    .dashboard {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(20px, 6vw, 90px);
+      border-bottom: 1px solid var(--border);
+      background: rgba(22,11,16,.85);
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .topbar-mark {
+      color: var(--accent-light);
+      font-family: Georgia, serif;
+      font-size: 25px;
+    }
+
+    .topbar-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+    }
+
+    .topbar-subtitle {
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-right: 12px;
+      color: var(--success);
+      font-size: 11px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 10px rgba(165,198,173,.4);
+    }
+
+    .subtle-button {
+      min-height: 37px;
+      padding: 0 13px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--soft);
+      background: var(--surface);
+      font-size: 12px;
+      transition: background .2s, border-color .2s;
+    }
+
+    .subtle-button:hover {
+      background: var(--surface-2);
+      border-color: rgba(214,154,170,.35);
+    }
+
+    .main {
+      width: min(1080px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 64px 0 80px;
+    }
+
+    .page-intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+
+    .page-title {
+      margin: 9px 0 8px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(43px, 7vw, 62px);
+      font-weight: 400;
+      letter-spacing: -.055em;
+      line-height: 1;
+    }
+
+    .page-description {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .date-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 42px;
+    }
+
+    .stat-card {
+      min-height: 112px;
+      padding: 21px 23px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(140deg, #291720, #211219);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-value {
+      margin-top: 7px;
+      font-family: Georgia, serif;
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 17px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-family: Georgia, serif;
+      font-size: 26px;
+      font-weight: 400;
+      letter-spacing: -.03em;
+    }
+
+    .message-total {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 19px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-input {
+      min-height: 44px;
+      padding-left: 40px;
+      font-size: 13px;
+    }
+
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      left: 14px;
+      color: var(--muted);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .toolbar .subtle-button {
+      min-height: 44px;
+    }
+
+    .message-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .message-card {
+      padding: 22px 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      transition: border-color .2s, transform .2s, background .2s;
+      animation: appear .3s ease both;
+    }
+
+    .message-card:hover {
+      border-color: rgba(214,154,170,.3);
+      background: #25141b;
+      transform: translateY(-2px);
+    }
+
+    .message-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .sender-name {
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    .sender-email {
+      display: inline-block;
+      margin-top: 3px;
+      color: var(--accent-light);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+      text-decoration: none;
+    }
+
+    .sender-email:hover { text-decoration: underline; }
+
+    .message-date {
+      flex-shrink: 0;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: right;
+    }
+
+    .message-body {
+      margin: 18px 0 0;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      color: #d8c8cd;
+      font-size: 14px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .empty-state,
+    .error-state {
+      padding: 55px 20px;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .empty-icon {
+      margin-bottom: 13px;
+      color: var(--accent-light);
+      font-family: Georgia, serif;
+      font-size: 34px;
+    }
+
+    .empty-title {
+      margin-bottom: 6px;
+      color: var(--text);
+      font-family: Georgia, serif;
+      font-size: 22px;
+    }
+
+    .notice {
+      margin: 0 0 20px;
+      padding: 13px 15px;
+      border: 1px solid rgba(229,160,160,.2);
+      border-radius: 10px;
+      color: var(--danger);
+      background: rgba(229,160,160,.06);
+      font-size: 13px;
+    }
+
+    .hidden { display: none !important; }
+
+    .bottom-note {
+      margin-top: 36px;
+      color: #806c73;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .brand { margin-bottom: 42px; }
+
+      .login-panel { padding: 20px; }
+
+      .topbar {
+        height: 68px;
+        padding: 0 17px;
+      }
+
+      .status-label { display: none; }
+
+      .topbar-actions { gap: 6px; }
+
+      .subtle-button {
+        min-height: 35px;
+        padding: 0 9px;
+        font-size: 11px;
+      }
+
+      .main {
+        width: calc(100% - 34px);
+        padding-top: 43px;
+      }
+
+      .page-intro {
+        display: block;
+        margin-bottom: 28px;
+      }
+
+      .date-label {
+        margin-top: 14px;
+        text-align: left;
+      }
+
+      .stats {
+        gap: 10px;
+        margin-bottom: 35px;
+      }
+
+      .stat-card {
+        min-height: 96px;
+        padding: 17px;
+      }
+
+      .stat-value { font-size: 30px; }
+
+      .section-heading h2 { font-size: 23px; }
+
+      .toolbar { gap: 7px; }
+
+      .toolbar .subtle-button {
+        padding: 0 10px;
+      }
+
+      .message-card { padding: 18px; }
+
+      .message-top { display: block; }
+
+      .message-date {
+        margin-top: 9px;
+        text-align: left;
+      }
+
+      .message-body { margin-top: 14px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <section class="login-screen" id="loginScreen">
+    <div class="login-wrap">
+
+      <div class="brand">
+        <div class="brand-mark">M.</div>
+        <div>
+          <div class="brand-name">MAHNOOR AZIZ</div>
+          <div class="brand-sub">PRIVATE WORKSPACE</div>
+        </div>
+      </div>
+
+      <div class="eyebrow">PERSONAL / ADMINISTRATION</div>
+      <h1 class="login-heading">A space<br>of your own.</h1>
+      <p class="login-description">
+        Your private inbox for conversations and messages from your portfolio.
+      </p>
+
+      <form class="login-panel" id="loginForm">
+        <label class="field-label" for="password">
+          Administrator password
+        </label>
+
+        <input
+          class="password-input"
+          id="password"
+          type="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button class="primary-button" id="loginButton" type="submit">
+          Open private inbox <span aria-hidden="true">→</span>
+        </button>
+
+        <p class="login-message" id="loginMessage" role="alert"></p>
+      </form>
+
+      <div class="login-footer">
+        PRIVATE ACCESS · AUTHORIZED USE ONLY
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="dashboard" id="dashboard">
+
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="topbar-mark">M.</div>
+        <div>
+          <div class="topbar-title">PRIVATE INBOX</div>
+          <div class="topbar-subtitle">MAHNOOR AZIZ</div>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="status-label">
+          <span class="status-dot"></span>
+          Secure session
+        </div>
+        <button class="subtle-button" id="refreshButton" type="button">
+          ↻ Refresh
+        </button>
+        <button class="subtle-button" id="logoutButton" type="button">
+          Lock inbox
+        </button>
+      </div>
+    </header>
+
+    <main class="main">
+
+      <div class="page-intro">
+        <div>
+          <div class="eyebrow">YOUR PRIVATE SPACE</div>
+          <h1 class="page-title">Messages.</h1>
+          <p class="page-description">
+            Every conversation, gathered in one place.
+          </p>
+        </div>
+
+        <div class="date-label" id="currentDate"></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-label">Total conversations</div>
+          <div class="stat-value" id="totalCount">—</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Currently displayed</div>
+          <div class="stat-value" id="visibleCount">—</div>
+        </div>
+      </div>
+
+      <section aria-labelledby="inboxHeading">
+        <div class="section-heading">
+          <h2 id="inboxHeading">Your inbox</h2>
+          <span class="message-total" id="messageTotal">Loading...</span>
+        </div>
+
+        <div class="notice hidden" id="dashboardNotice" role="alert"></div>
+
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input
+              class="search-input"
+              id="searchInput"
+              type="search"
+              placeholder="Search name, email or message..."
+              aria-label="Search messages"
+            >
+          </div>
+
+          <button
+            class="subtle-button"
+            id="clearSearch"
+            type="button"
+          >
+            Clear
+          </button>
+        </div>
+
+        <div class="message-list" id="messageList" aria-live="polite">
+          <div class="empty-state">Loading your messages...</div>
+        </div>
+      </section>
+
+      <div class="bottom-note">
+        PRIVATE WORKSPACE · YOUR MESSAGES ARE NOT PUBLIC
+      </div>
+
+    </main>
+  </section>
+
+  <script>
+    const loginScreen = document.getElementById('loginScreen');
+    const dashboard = document.getElementById('dashboard');
+    const loginForm = document.getElementById('loginForm');
+    const passwordInput = document.getElementById('password');
+    const loginButton = document.getElementById('loginButton');
+    const loginMessage = document.getElementById('loginMessage');
+    const messageList = document.getElementById('messageList');
+    const searchInput = document.getElementById('searchInput');
+    const dashboardNotice = document.getElementById('dashboardNotice');
+
+    let adminPassword = '';
+    let messages = [];
+    let isLoading = false;
+
+    document.getElementById('currentDate').textContent =
+      new Date().toLocaleDateString(undefined, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+    function showLogin(message = '') {
+      adminPassword = '';
+      messages = [];
+      passwordInput.value = '';
+      loginMessage.textContent = message;
+
+      dashboard.style.display = 'none';
+      loginScreen.style.display = 'grid';
+
+      document.getElementById('totalCount').textContent = '—';
+      document.getElementById('visibleCount').textContent = '—';
+
+      passwordInput.focus();
+    }
+
+    function showDashboard() {
+      loginScreen.style.display = 'none';
+      dashboard.style.display = 'block';
+      dashboardNotice.classList.add('hidden');
+    }
+
+    function showError(message, location = 'login') {
+      if (location === 'login') {
+        loginMessage.textContent = message;
+      } else {
+        dashboardNotice.textContent = message;
+        dashboardNotice.classList.remove('hidden');
+      }
+    }
+
+    async function fetchMessages(password) {
+      const response = await fetch('/api/admin/messages', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer ' + password
+        },
+        cache: 'no-store'
+      });
+
+      if (response.status === 401) {
+        const error = new Error('Wrong password. Please try again.');
+        error.status = 401;
+        throw error;
+      }
+
+      if (response.status === 429) {
+        const error = new Error(
+          'Too many attempts. Wait for the rate limit to reset before trying again.'
+        );
+        error.status = 429;
+        throw error;
+      }
+
+      if (response.status === 503) {
+        const error = new Error(
+          'Supabase is not configured on the server.'
+        );
+        error.status = 503;
+        throw error;
+      }
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        const error = new Error(
+          `Server error (${response.status}): ${body.error || 'unknown_error'}`
+        );
+        error.status = response.status;
+        throw error;
+      }
+
+      return response.json();
+    }
+
+    loginForm.addEventListener('submit', async event => {
+      event.preventDefault();
+
+      if (isLoading) return;
+
+      const enteredPassword = passwordInput.value;
+
+      if (!enteredPassword) {
+        showError('Please enter your password.');
+        return;
+      }
+
+      isLoading = true;
+      loginButton.disabled = true;
+      loginButton.textContent = 'Verifying access...';
+      loginMessage.textContent = '';
+
+      try {
+        const rows = await fetchMessages(enteredPassword);
+
+        adminPassword = enteredPassword;
+        messages = Array.isArray(rows) ? rows : [];
+
+        passwordInput.value = '';
+        showDashboard();
+        renderMessages();
+
+      } catch (error) {
+        passwordInput.value = '';
+        showError(error.message || 'Unable to access your inbox.');
+      } finally {
+        isLoading = false;
+        loginButton.disabled = false;
+        loginButton.innerHTML = 'Open private inbox <span aria-hidden="true">→</span>';
+      }
     });
 
-    p.value = '';
+    async function refreshMessages() {
+      if (isLoading || !adminPassword) return;
 
-    if (r.status === 401) {
-      s.textContent = 'Wrong password.';
-      return;
+      isLoading = true;
+
+      const refreshButton = document.getElementById('refreshButton');
+      refreshButton.disabled = true;
+      refreshButton.textContent = 'Refreshing...';
+
+      try {
+        const rows = await fetchMessages(adminPassword);
+        messages = Array.isArray(rows) ? rows : [];
+        dashboardNotice.classList.add('hidden');
+        renderMessages();
+
+      } catch (error) {
+        if (error.status === 401) {
+          showLogin('Your session is no longer authorized. Please sign in again.');
+          return;
+        }
+
+        showError(error.message || 'Unable to refresh messages.', 'dashboard');
+      } finally {
+        isLoading = false;
+        refreshButton.disabled = false;
+        refreshButton.textContent = '↻ Refresh';
+      }
     }
 
-    if (r.status === 429) {
-      s.textContent = 'Too many attempts. Wait for the rate limit to reset.';
-      return;
+    function renderMessages() {
+      const query = searchInput.value.trim().toLowerCase();
+
+      const filtered = messages.filter(message => {
+        const searchable = [
+          message.name,
+          message.email,
+          message.message
+        ].join(' ').toLowerCase();
+
+        return searchable.includes(query);
+      });
+
+      document.getElementById('totalCount').textContent = messages.length;
+      document.getElementById('visibleCount').textContent = filtered.length;
+      document.getElementById('messageTotal').textContent =
+        messages.length + (messages.length === 1 ? ' message' : ' messages');
+
+      messageList.replaceChildren();
+
+      if (!messages.length) {
+        messageList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">✳</div>
+            <div class="empty-title">A quiet inbox.</div>
+            <div>No messages have arrived yet.</div>
+          </div>
+        `;
+        return;
+      }
+
+      if (!filtered.length) {
+        messageList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⌕</div>
+            <div class="empty-title">Nothing found.</div>
+            <div>Try another name, email or keyword.</div>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach((message, index) => {
+        const article = document.createElement('article');
+        article.className = 'message-card';
+        article.style.animationDelay = Math.min(index * 35, 250) + 'ms';
+
+        const top = document.createElement('div');
+        top.className = 'message-top';
+
+        const sender = document.createElement('div');
+
+        const name = document.createElement('div');
+        name.className = 'sender-name';
+        name.textContent = message.name || 'Unknown sender';
+
+        const email = document.createElement('a');
+        email.className = 'sender-email';
+        email.textContent = message.email || 'No email provided';
+
+        if (message.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(message.email)) {
+          email.href = 'mailto:' + message.email;
+        } else {
+          email.removeAttribute('href');
+        }
+
+        sender.append(name, email);
+
+        const date = document.createElement('time');
+        date.className = 'message-date';
+
+        const timestamp = new Date(message.at);
+
+        if (!Number.isNaN(timestamp.getTime())) {
+          date.dateTime = timestamp.toISOString();
+          date.textContent = timestamp.toLocaleString(undefined, {
+            dateStyle: 'medium',
+            timeStyle: 'short'
+          });
+        } else {
+          date.textContent = 'Date unavailable';
+        }
+
+        const body = document.createElement('p');
+        body.className = 'message-body';
+        body.textContent = message.message || '(No message content)';
+
+        top.append(sender, date);
+        article.append(top, body);
+        messageList.append(article);
+      });
     }
 
-    if (r.status === 503) {
-      s.textContent = 'Supabase is not configured on the server.';
-      return;
-    }
+    searchInput.addEventListener('input', renderMessages);
 
-    if (!r.ok) {
-      const error = await r.json().catch(() => ({}));
-      s.textContent = `Server error (${r.status}): ${error.error || 'unknown_error'}`;
-      return;
-    }
-
-    const rows = await r.json();
-    s.textContent = rows.length
-      ? rows.length + ' message(s)'
-      : 'No messages yet.';
-
-    rows.forEach(m => {
-      const a = document.createElement('article');
-      const h = document.createElement('small');
-      h.textContent = new Date(m.at).toLocaleString()
-        + ' | ' + m.name + ' | ' + m.email;
-      a.append(h, document.createElement('br'),
-        document.createTextNode(m.message));
-      o.append(a);
+    document.getElementById('clearSearch').addEventListener('click', () => {
+      searchInput.value = '';
+      renderMessages();
+      searchInput.focus();
     });
-  } catch (err) {
-    p.value = '';
-    s.textContent = 'Network error: Could not reach the API.';
-  }
-};
-</script>
+
+    document.getElementById('refreshButton')
+      .addEventListener('click', refreshMessages);
+
+    document.getElementById('logoutButton').addEventListener('click', () => {
+      searchInput.value = '';
+      showLogin();
+    });
+  </script>
+
+</body>
 </html>
